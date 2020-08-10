@@ -79,7 +79,7 @@ onInputChange=(event)=>{
 }
 onButtonSubmit=()=>{
 	this.setState({imageUrl:this.state.input})
-	fetch('http://localhost:3001/imageurl',{
+	fetch('https://frozen-mountain-28132.herokuapp.com/imageurl',{
 	 	method:'post',
 	 	headers:{'Content-Type':'application/json'},
         body:JSON.stringify({
@@ -89,27 +89,25 @@ onButtonSubmit=()=>{
       })
         .then(response=>response.json())
 
-	.then((response)=>{
-	 this.displayFaceBox(this.calculateFace(response))
-	 fetch('http://localhost:3001/image',{
-	 	method:'post',
-	 	headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({
-          id:this.state.user.id
-         
-      })
-        
+	.then(response => {
+        if (response) {
+          fetch('https://frozen-mountain-28132.herokuapp.com/image', {
+            method: 'post',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+              id: this.state.user.id
+            })
+          })
+            .then(response => response.json())
+            .then(count => {
+              this.setState(Object.assign(this.state.user, { entries: count}))
+            })
 
-	 })
-	 .then(response=>response.json())
-	 .then(data=>{
-	 	this.setState(Object.assign(this.state.user,{entries:data})
-	 })
-     
- })
-	
-	.catch((err)=>console.log(err))
-   }
+        }
+        this.displayFaceBox(this.calculateFaceLocation(response))
+      })
+      .catch(err => console.log(err));
+  }
 onRouteChange=(route)=>{
 	if(route ==='SignIn'){
 		this.setState(initialstate)

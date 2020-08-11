@@ -79,18 +79,8 @@ onInputChange=(event)=>{
 }
 onButtonSubmit=()=>{
 	this.setState({imageUrl:this.state.input})
-	fetch('https://frozen-mountain-28132.herokuapp.com/imageurl',{
-	 	method:'post',
-	 	headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({
-          url:this.state.imageUrl
-         
-      })
-      })
-        .then(response=>response.json())
 
-	.then(response => {
-        if (response) {
+	 
           fetch('https://frozen-mountain-28132.herokuapp.com/image', {
             method: 'post',
             headers: {'Content-Type': 'application/json'},
@@ -98,15 +88,29 @@ onButtonSubmit=()=>{
               id: this.state.user.id
             })
           })
-            .then(response => response.json())
+            .then(response =>response.json())
             .then(count => {
               this.setState(Object.assign(this.state.user, { entries: count}))
+              if (count) {  
+				fetch('https://frozen-mountain-28132.herokuapp.com/imageurl',{
+				 	method:'post',
+				 	headers:{'Content-Type':'application/json'},
+			        body:JSON.stringify({
+			          url:this.state.imageUrl
+			         
+			      })
+			    })
+			     .then(response=>response.json())
+
+				.then(response => {
+			        
+			        this.displayFaceBox(this.calculateFace(response))
+			      })}
             })
 
-        }
-        this.displayFaceBox(this.calculateFaceLocation(response))
-      })
+     
       .catch(err => console.log(err));
+
   }
 onRouteChange=(route)=>{
 	if(route ==='SignIn'){
